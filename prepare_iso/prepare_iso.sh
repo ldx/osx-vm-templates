@@ -176,8 +176,9 @@ DMG_OS_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :ProductBuildVersion' "$SYSVER_
 msg_status "OS X version detected: 10.$DMG_OS_VERS_MAJOR.$DMG_OS_VERS_MINOR, build $DMG_OS_BUILD"
 
 OUTPUT_DMG="$OUT_DIR/OSX_InstallESD_${DMG_OS_VERS}_${DMG_OS_BUILD}.dmg"
-if [ -e "$OUTPUT_DMG" ]; then
-	msg_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
+OUTPUT_CDR="$OUT_DIR/OSX_InstallESD_${DMG_OS_VERS}_${DMG_OS_BUILD}.cdr"
+if [ -e "$OUTPUT_DMG" -o -e "$OUTPUT_CDR" ]; then
+	msg_error "Output file $OUTPUT_DMG or $OUTPUT_CDR already exists! We're not going to overwrite it, exiting.."
 	hdiutil detach -force "$MNT_ESD"
 	exit 1
 fi
@@ -321,8 +322,12 @@ if [ -n "$DEFAULT_ISO_DIR" ]; then
 	sed -i -e "s/%OSX_ISO%/${ISO_FILE}/" "$DEFINITION_FILE"
 fi
 
+# Convert dmg to cdr (iso).
+hdiutil convert $OUTPUT_DMG -format UDTO -o $OUTPUT_CDR
+rm $OUTPUT_DMG
+
 msg_status "Checksumming output image.."
-MD5=$(md5 -q "$OUTPUT_DMG")
+MD5=$(md5 -q "$OUTPUT_CDR")
 msg_status "MD5: $MD5"
 
-msg_status "Done. Built image is located at $OUTPUT_DMG. Add this iso and its checksum to your template."
+msg_status "Done. Built image is located at $OUTPUT_CDR. Add this iso and its checksum to your template."
