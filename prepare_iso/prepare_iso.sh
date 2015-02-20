@@ -200,6 +200,24 @@ mkdir -p "$SUPPORT_DIR/tmp/Scripts"
 cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
+# Add Chameleon configuration file
+mkdir -p "$SUPPORT_DIR/pkgroot/Extra"
+cat << EOF > "$SUPPORT_DIR/pkgroot/Extra/org.chameleon.Boot.plist"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Timeout</key>
+        <string>2</string>
+        <key>Wait</key>
+        <string>No</string>
+        <key>Instant Menu</key>
+        <string>No</string>
+        <key>Quiet Boot</key>
+        <string>No</string>
+</dict>
+EOF
+
 # build it
 BUILT_COMPONENT_PKG="$SUPPORT_DIR/tmp/veewee-config-component.pkg"
 BUILT_PKG="$SUPPORT_DIR/tmp/veewee-config.pkg"
