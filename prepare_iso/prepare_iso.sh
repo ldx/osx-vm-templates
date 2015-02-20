@@ -274,6 +274,18 @@ cp "$SUPPORT_DIR/OSInstall.collection" "$PACKAGES_DIR/"
 cp "$BUILT_PKG" "$PACKAGES_DIR/"
 rm -rf "$SUPPORT_DIR/tmp"
 
+# Add extra packages
+msg_status "Adding extra packages.."
+for pkgpath in $SUPPORT_DIR/extra_packages/*.pkg; do
+	cp "$pkgpath" "$PACKAGES_DIR/"
+	pkg=$(basename "$pkgpath")
+	echo "$pkg"
+	if ! grep "$pkg" "$PACKAGES_DIR/OSInstall.collection"; then
+		msg_status "Adding $pkg to OSInstall.collection.."
+		/usr/libexec/PlistBuddy -c "Add : string \"/System/Installation/Packages/${pkg}\"" $PACKAGES_DIR/OSInstall.collection
+	fi
+done
+
 msg_status "Unmounting BaseSystem.."
 hdiutil detach "$MNT_BASE_SYSTEM"
 
